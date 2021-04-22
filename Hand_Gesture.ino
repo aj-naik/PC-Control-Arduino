@@ -24,12 +24,11 @@ void find_distance (void)
   digitalWrite(trigPin1, LOW);
 
   duration = pulseIn(echoPin1, HIGH, 5000);// here this pulsein function wont wait more then 5000us for the ultrasonic sound to came back. (due to this it wont measure more than 60cm)
-                                           // it helps this project to use the gesture control in the defined space. 
-                                           // so that, it will return zero if distance greater then 60m. ( it helps usually if we remove our hands infront of the sensors ).
+                                           
  
   r = 3.4 * duration / 2;                  // calculation to get the measurement in cm using the time returned by the pulsein function.     
   distance1 = r / 100.00;
-  /////////////////////////////////////////upper part for left sensor and lower part for right sensor
+
   digitalWrite(trigPin2, LOW);
   delayMicroseconds(2);
   digitalWrite(trigPin2, HIGH);
@@ -55,37 +54,37 @@ void setup()
 
 void loop()
 {
-  find_distance(); // this function will stores the current distance measured by the ultrasonic sensor in the global variable "distance1 and distance2"
-                   // no matter what, the program has to call this "find_distance" function continuously to get the distance value at all time.
+  find_distance(); // this function will store the current distance measured by the ultrasonic sensor in the global variable "distance1 and distance2"
+           
   
-  if(distance2<=35 && distance2>=15) // once if we placed our hands in front of the right sensor in the range between 15 to 35cm this condition becomes true.
+  if(distance2<=35 && distance2>=15)
   { 
-    temp=millis();                   // store the current time in the variable temp. (" millis " Returns the number of milliseconds since the Arduino board began running the current program )
-    while(millis()<=(temp+300))      // this loop measures the distance for another 300 milliseconds. ( it helps to find the difference between the swipe and stay of our hand in front of the right sensor )
+    temp=millis();                   
+    while(millis()<=(temp+300))      
     find_distance();
-    if(distance2<=35 && distance2>=15) // this condition will true if we place our hand in front of the right sensor for more then 300 milli seconds. 
+    if(distance2<=35 && distance2>=15) 
     {
-     temp=distance2;                         // store the current position of our hand in the variable temp. 
-     while(distance2<=50 || distance2==0)    // this loop will run untill we removes our hand in front of the right sensor.
+     temp=distance2;                         
+     while(distance2<=50 || distance2==0)    
      {
-       find_distance();                      // call this function continuously to get the live data. 
-       if((temp+6)<distance2)                // this condition becomes true if we moves our hand away from the right sensor (**but in front of it ). here " temp+6 " is for calibration.
+       find_distance();                      
+       if((temp+6)<distance2)                // this condition becomes true if we move our hand away from the right sensor 
        {
-       Serial.println("down");               // send "down" serially.
+       Serial.println("down");              
        }
        else if((temp-6)>distance2)           // this condition becomes true if we moves our hand closer to the right sensor.
        {
-        Serial.println("up");                // send "up" serially.
+        Serial.println("up");                
        }
      }
     }
     else                                     // this condition becomes true, if we only swipe in front of the right sensor . 
     {
-      Serial.println("next");                // send "next" serially.
+      Serial.println("next");                
     }
   }
 
-  else if(distance1<=35 && distance1>=15)   // once if we placed our hands in front of the left sensor in the range between 15 to 35cm this condition becomes true.
+  else if(distance1<=35 && distance1>=15)   
   { 
   
     temp=millis();                           
@@ -93,17 +92,17 @@ void loop()
     while(millis()<=(temp+300))             
     {
        find_distance();
-       if(distance2<=35 && distance2>=15)  // if our hand detects in the right sensor before 300 milli seconds this condition becomes true. ( usually it happens if we swipe our hand from left to right sensor )
+       if(distance2<=35 && distance2>=15)  
        {
-         Serial.println("change");         // send "change" serially.
-         l=1;                              // store 1 in variable l. ( it avoids the program to enter into the upcoming if condition )
-         break;                            // break the loop.
+         Serial.println("change");        
+         l=1;                              
+         break;                            
        }
     }
     
     if(l==0)                               // this condition will become true, only if we swipe our hand in front of left sensor.
     {
-    Serial.println("previous");            // send "previous" serially.
+    Serial.println("previous");           
     while(distance1<=35 && distance1>=15) // this loop will rotate untill we removes our hand infront of the left sensor. this will avoid not to enter this if condition again.
     find_distance();                      
     }
